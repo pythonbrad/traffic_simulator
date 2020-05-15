@@ -43,6 +43,7 @@ if not 'carrefour_list' in logic.globalDict:
 #     LES TARGETS DOIVENT ETRE DE TYPE GHOST
 #    VEHICULE IN LOW POLY
 #		If problem of speed you can increase the number of skip if you use always Sensor
+#    I CAN USE get_distance_to to get the distance to an object
 #
 #
 #
@@ -55,22 +56,54 @@ class Taxi(types.KX_GameObject):
 		Sensor:Always->Controller:And>Actuator:Steering target should be the begin of each IA
 		Sensor:Always with step=1->Controller:Python->Actuator:Steering
 		Sensor:Near with property=target and distance 0.5->Controller:Python
+		Sensor:Radar with property=ia and distance 10->Controller:Python
 	'''
 	def __init__(self, own):
 		con = logic.getCurrentController()
 		self.steering = con.actuators['Steering']
 		self.near = con.sensors['Near']
+		self.radar = con.sensors['Radar']
 		# We convert to got in type str
 		self.current_position = str(self.steering.target)
 		self.previous_position = str(self.steering.target)
+		self.destination = str(self.steering.target)
+		# We config the data of steering
+		self.steering.velocity = self['velocity']
+		self.steering.acceleration = self['acceleration']
 		# We config the finder of path
 		self.path_finder = PathFinder(logic.globalDict['carrefour_data'])
+		# We enable it to increase the probability to obtain different paths with same begin and end
+		self.path_finder.random_path = 1
 		# Will be used to prevent some error
-		self.previous_previous_position = str(self.steering.target)
+		#self.previous_previous_position = str(self.steering.target)
 		self.target_list = []
+		# We define constant
+		self.NORMAL_STATE = 1
+		self.WAITING_STATE = 2
 	def main(self):
-		if self.target_terminated():
-			self.previous_previous_position = self.previous_position
+		# We restore destination if changed
+		self.restore_destination()
+		# We verify if target terminated
+		self.target_terminated()
+		# We verify ia detected
+		self.car_detector()
+	def restore_destination(self):
+		if str(self.steering.target) != self.destination:
+			self.steering.target = self.destination
+	def car_detector(self):
+		# We get the cars detected
+		near_cars = self.radar.hitObjectList
+		# We verify the radar of each car detected
+		for near_car in near_cars:
+			near_car_radar = near_car.sensors['Radar']
+			# if i am detected by an other car, this car wait that I pass else I wait him
+			if self in near_car_radar.hitObjectList:
+				near_car.state = self.WAITING_STATE
+			else:
+				self.state = self.WAITING_STATE
+	def target_terminated(self):
+		if self.steering.target in self.near.hitObjectList:
+			#self.previous_previous_position = self.previous_position
 			self.previous_position = self.current_position
 			self.current_position = str(self.steering.target)
 			if self.target_list:
@@ -78,14 +111,13 @@ class Taxi(types.KX_GameObject):
 			else:
 				#print('target_terminated')
 				self.find_target()
-	def target_terminated(self):
-		return self.steering.target in [obj for obj in self.near.hitObjectList]
 	def next_target(self):
 		# We get and delete the next target
-		self.steering.target = self.target_list.pop(0)
+		self.destination = self.steering.target = self.target_list.pop(0)
 	def find_target(self):
 		# We start the finder
 		begin = self.current_position
+		# We get an random end
 		end = random.choice(logic.globalDict['carrefour_list'])
 		# We verify if found
 		if self.path_finder.find(begin, end):

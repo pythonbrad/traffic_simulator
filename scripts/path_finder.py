@@ -1,3 +1,5 @@
+import random
+
 class Path:
 	'''
 		This class contruct a path begin by A and end by B in using the carrefour_data
@@ -8,6 +10,8 @@ class Path:
 		self.end = None
 		self.path = []
 		self.carrefour_already_used = []
+		# If true, we will increase the probability to obtain different paths with same begin and end
+		self.random_path = 0
 	def find(self, begin, end):
 		self.begin = begin
 		self.end = end
@@ -23,6 +27,9 @@ class Path:
 		else:
 			# We get near carrefours
 			near_carrefours = self.carrefour_data[self.path[-1]]
+			# We shuffle to obtain an random path
+			if self.random_path:
+				random.shuffle(near_carrefours)
 			# We browse it if not already present and used
 			for near_carrefour in near_carrefours:
 				# We restore the path if modified
