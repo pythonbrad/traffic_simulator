@@ -9,7 +9,7 @@ class Path:
 		self.begin = None
 		self.end = None
 		self.path = []
-		self.carrefour_already_used = []
+		self.carrefour_to_ignore = {}
 		# If true, we will increase the probability to obtain different paths with same begin and end
 		self.random_path = 0
 	def find(self, begin, end):
@@ -17,7 +17,8 @@ class Path:
 		self.end = end
 		# We clean data
 		self.path = [self.begin]
-		self.carrefour_already_used = []
+		if not end in self.carrefour_to_ignore:
+			self.carrefour_to_ignore[end] = []
 		# We start the browse and return the status
 		return self.browse(1)
 	def browse(self, path_length):
@@ -35,15 +36,16 @@ class Path:
 				# We restore the path if modified
 				# Because can be modified the previous loop
 				self.path = self.path[:path_length]
-				if not near_carrefour in self.path and not near_carrefour in self.carrefour_already_used:
+				if not near_carrefour in self.path and not near_carrefour in self.carrefour_to_ignore[self.end]:
 					# We save the near carrefour
 					self.path.append(near_carrefour)
-					# We mark it already used to evit an inutile browse
-					self.carrefour_already_used.append(near_carrefour)
 					# We start a new browse, and increment the path length
 					path_found = self.browse(path_length+1)
 					# We verify if path found
 					if path_found:
 						return path_found
+					else:
+						# We mark it inutile to evit an inutile browse
+						self.carrefour_to_ignore[self.end].append(near_carrefour)
 		# If we arrive here, path not found
 		return 0

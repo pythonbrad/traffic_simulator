@@ -32,10 +32,11 @@ import random, pickle
 from .path_finder import Path as PathFinder
 
 # We get list_carrefour
-if not 'carrefour_list' in logic.globalDict:
+if not 'carrefour_data' in logic.globalDict:
 	f = open(logic.expandPath('//')+'data.bin', 'rb')
 	logic.globalDict['carrefour_data'] = pickle.load(f)
 	logic.globalDict['carrefour_list'] = [i for i in logic.globalDict['carrefour_data']]
+	logic.globalDict['carrefour_to_ignore'] = {}
 	f.close()
 
 #
@@ -72,6 +73,7 @@ class Taxi(types.KX_GameObject):
 		self.steering.acceleration = self['acceleration']
 		# We config the finder of path
 		self.path_finder = PathFinder(logic.globalDict['carrefour_data'])
+		self.carrefour_to_ignore = logic.globalDict['carrefour_to_ignore']
 		# We enable it to increase the probability to obtain different paths with same begin and end
 		self.path_finder.random_path = 1
 		# Will be used to prevent some error
