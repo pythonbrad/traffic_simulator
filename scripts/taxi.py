@@ -83,12 +83,18 @@ class Taxi(types.KX_GameObject):
 		self.NORMAL_STATE = 1
 		self.WAITING_STATE = 2
 	def main(self):
+		# We verify if can continuous to life
+		self.can_life()
 		# We restore destination if changed
 		self.restore_destination()
 		# We verify if target terminated
 		self.target_terminated()
 		# We verify ia detected
 		self.car_detector()
+	def can_life(self):
+		# It die if far of the Camera
+		if self.getDistanceTo('Camera') >= 200:
+			self.endObject()
 	def restore_destination(self):
 		if str(self.steering.target) != self.destination:
 			self.steering.target = self.destination

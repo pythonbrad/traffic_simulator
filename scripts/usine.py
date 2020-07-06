@@ -2,24 +2,18 @@ from bge import logic
 import random
 
 def main(con):
-	# Recuperer l usine
-	usine = con.owner
-	# We verify if already init
-	if not 'init' in usine:
-		usine['init'] = True
-		# We init the number of ia generated
-		usine['nb_ia'] = 1
-	elif usine['nb_ia'] < 50:
-		# We increment the number of ia
-		usine['nb_ia'] += 1
-	else:
-		# We disable the repeat
-		sensor = usine.sensors['Delay']
-		sensor.repeat = False
 	# Recuperer la scene
 	scene = logic.getCurrentScene()
-	# Recuperer la voiture sur son calque invisible
-	car = scene.objectsInactive[random.choice(["ia","ia2","ia3","ia4","ia5"])]
-	car.actuators['Steering'].target = usine['begin']
-	# Creer une instance
-	instance = scene.addObject(car, usine, 0)
+	# We get all target near of the camera
+	origin_list = [obj for obj in scene.objects if 'target' in obj and int(obj.getDistanceTo('Camera')) in range(100, 200)]
+	# We verify if not empty
+	if origin_list:
+		# Recuperer un origin
+		origin = random.choice(origin_list)
+		# Recuperer la voiture sur son calque invisible
+		car = scene.objectsInactive[random.choice(["ia","ia2","ia3","ia4","ia5"])]
+		car.actuators['Steering'].target = origin
+		# Creer une instance
+		instance = scene.addObject(car, origin, 0)
+	else:
+		pass
