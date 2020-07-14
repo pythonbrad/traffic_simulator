@@ -146,7 +146,7 @@ class TargetGenerator(bpy.types.Operator):
         # We leave edit mode
         bpy.ops.object.editmode_toggle()
         # We create the obj source
-        bpy.ops.mesh.primitive_cube_add(radius=.1)
+        bpy.ops.mesh.primitive_cube_add(radius=.05)
         obj_src = bpy.context.selected_objects[0]
         bpy.ops.object.game_property_new(type='STRING', name='target')
         prop = obj_src.game.properties['target']

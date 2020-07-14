@@ -56,7 +56,7 @@ class Taxi(types.KX_GameObject):
 		WARNING don't enable self_tetminated, it disable the steering of the object
 		Sensor:Always->Controller:And>Actuator:Steering target should be the begin of each IA
 		Sensor:Always with step=1->Controller:Python->Actuator:Steering
-		Sensor:Near with property=target and distance 0.5->Controller:Python
+		Sensor:Near with property=target and distance should be proportionnel to the target spacing->Controller:Python
 		Sensor:Radar with property=ia and distance 10->Controller:Python
 	'''
 	def __init__(self, own):

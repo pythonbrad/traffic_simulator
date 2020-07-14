@@ -1,0 +1,15 @@
+possibility to do target sens by sens (sens +, sens - and create the carrefour manuelly by the user in the carrefour dict)
+this method permit to get a better result
+
+------------------------------------------->(+)
+|  				   (c)   				   |
+|  <-------------------------------------  |(-)
+|  |                                    |  |
+|  |                                    |  |
+|  ------------------------------------->  |(-)
+|  				(c)   					   |
+<-------------------------------------------(+)
+
+(c) represnt the carrefour
+(+) represent the positive sens
+(-) represent the negative sens
